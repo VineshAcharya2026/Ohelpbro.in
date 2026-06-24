@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,47 +15,34 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ALL_SERVICES } from "@/lib/constants";
+import { submitViaWhatsApp } from "@/lib/whatsapp";
 import {
   contactFormSchema,
   type ContactFormData,
 } from "@/lib/validations";
 
 export function ContactForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-
   const {
     register,
     handleSubmit,
     setValue,
-    reset,
     formState: { errors },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
   });
 
-  const onSubmit = async (data: ContactFormData) => {
-    setStatus("loading");
-    setErrorMessage("");
+  const onSubmit = (data: ContactFormData) => {
+    const lines = [
+      "Hi, I'm contacting Ohelpbro.",
+      "",
+      `Name: ${data.fullName}`,
+      `Email: ${data.email}`,
+      `Phone: ${data.phone}`,
+      `Service: ${data.service}`,
+    ];
+    if (data.message) lines.push(`Message: ${data.message}`);
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, formType: "contact" }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to send message");
-      }
-
-      setStatus("success");
-      reset();
-    } catch (err) {
-      setStatus("error");
-      setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
-    }
+    submitViaWhatsApp(lines.join("\n"));
   };
 
   return (
@@ -86,7 +73,7 @@ export function ContactForm() {
 
       <div>
         <Label>Service Interested In *</Label>
-        <Select onValueChange={(val) => setValue("service", val)}>
+        <Select onValueChange={(val) => setValue("service", val, { shouldValidate: true })}>
           <SelectTrigger className="mt-1.5">
             <SelectValue placeholder="Select a service" />
           </SelectTrigger>
@@ -108,19 +95,13 @@ export function ContactForm() {
         <Textarea id="message" {...register("message")} className="mt-1.5" />
       </div>
 
-      {status === "success" && (
-        <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-          Thank you! Your message has been sent successfully.
-        </p>
-      )}
-      {status === "error" && (
-        <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">
-          {errorMessage}
-        </p>
-      )}
+      <p className="text-sm text-muted-foreground">
+        Submitting opens WhatsApp with your details pre-filled to +91 95380 33894.
+      </p>
 
-      <Button type="submit" variant="primary" className="w-full" disabled={status === "loading"}>
-        {status === "loading" ? "Sending..." : "Submit"}
+      <Button type="submit" variant="primary" className="w-full bg-[#25D366] hover:bg-[#20BD5A]">
+        <MessageCircle className="mr-2 h-4 w-4" />
+        Send via WhatsApp
       </Button>
     </form>
   );

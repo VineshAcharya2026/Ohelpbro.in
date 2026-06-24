@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,23 +16,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { ALL_SERVICES, EMPLOYEE_TYPES } from "@/lib/constants";
+import { submitViaWhatsApp } from "@/lib/whatsapp";
 import {
   registerCustomerSchema,
   type RegisterCustomerData,
 } from "@/lib/validations";
 
 export function RegisterCustomerForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState("");
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const {
     register,
     handleSubmit,
     setValue,
-    reset,
     formState: { errors },
   } = useForm<RegisterCustomerData>({
     resolver: zodResolver(registerCustomerSchema),
@@ -46,32 +44,23 @@ export function RegisterCustomerForm() {
     setValue("servicesNeeded", updated, { shouldValidate: true });
   };
 
-  const onSubmit = async (data: RegisterCustomerData) => {
-    setStatus("loading");
-    setErrorMessage("");
+  const onSubmit = (data: RegisterCustomerData) => {
+    const lines = [
+      "Hi, I'd like to register as a customer on Ohelpbro.",
+      "",
+      `Name: ${data.fullName}`,
+      `Email: ${data.email}`,
+      `Phone: ${data.phone}`,
+    ];
+    if (data.companyName) lines.push(`Company: ${data.companyName}`);
+    lines.push(
+      `Services Needed: ${data.servicesNeeded.join(", ")}`,
+      `Employee Type: ${data.employeeType}`
+    );
+    if (data.message) lines.push(`Additional Requirements: ${data.message}`);
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, formType: "register-customer" }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to submit registration");
-      }
-
-      setStatus("success");
-      reset();
-      setSelectedServices([]);
-    } catch (err) {
-      setStatus("error");
-      setErrorMessage(err instanceof Error ? err.message : "Something went wrong");
-    }
+    submitViaWhatsApp(lines.join("\n"));
   };
-
-  const whatsappMessage = `Hi, I'd like to register as a customer on Ohelpbro.`;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -129,7 +118,7 @@ export function RegisterCustomerForm() {
 
       <div>
         <Label>Employee Type Needed *</Label>
-        <Select onValueChange={(val) => setValue("employeeType", val)}>
+        <Select onValueChange={(val) => setValue("employeeType", val, { shouldValidate: true })}>
           <SelectTrigger className="mt-1.5">
             <SelectValue placeholder="Select employee type" />
           </SelectTrigger>
@@ -153,28 +142,14 @@ export function RegisterCustomerForm() {
         <Textarea id="message" {...register("message")} className="mt-1.5" />
       </div>
 
-      {status === "success" && (
-        <p className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-          Registration submitted successfully! We&apos;ll be in touch soon.
-        </p>
-      )}
-      {status === "error" && (
-        <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">
-          {errorMessage}
-        </p>
-      )}
+      <p className="text-sm text-muted-foreground">
+        Submitting opens WhatsApp with your registration details to +91 95380 33894.
+      </p>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Button
-          type="submit"
-          variant="primary"
-          className="flex-1"
-          disabled={status === "loading"}
-        >
-          {status === "loading" ? "Submitting..." : "Submit Registration"}
-        </Button>
-        <WhatsAppButton message={whatsappMessage} className="flex-1" />
-      </div>
+      <Button type="submit" variant="primary" className="w-full bg-[#25D366] hover:bg-[#20BD5A]">
+        <MessageCircle className="mr-2 h-4 w-4" />
+        Register via WhatsApp
+      </Button>
     </form>
   );
 }

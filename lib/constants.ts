@@ -1,4 +1,5 @@
-export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "91XXXXXXXXXX";
+export const WHATSAPP_NUMBER =
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919538033894";
 
 export const SITE_NAME = "Ohelpbro";
 export const COMPANY_NAME = "Ophiliya & Co";
@@ -6,7 +7,7 @@ export const GST_NUMBER = "29BIWPKO458D1ZX";
 
 export const CONTACT_INFO = {
   address: "Bangalore, Karnataka, India",
-  phone: "+91 XXXXXXXXXX",
+  phone: "+91 95380 33894",
   email: "contact@ohelpbro.in",
 };
 
