@@ -31,10 +31,10 @@ interface LeadsTableProps {
 }
 
 const statusColors: Record<string, string> = {
-  new: "bg-blue-100 text-blue-800",
-  contacted: "bg-yellow-100 text-yellow-800",
-  assigned: "bg-purple-100 text-purple-800",
-  closed: "bg-green-100 text-green-800",
+  new: "bg-accent-light text-accent-dark",
+  contacted: "bg-amber-50 text-amber-800",
+  assigned: "bg-primary/10 text-primary",
+  closed: "bg-emerald-50 text-emerald-800",
 };
 
 export function LeadsTable({

@@ -38,7 +38,7 @@ export default function AdminOverviewPage() {
         </div>
 
         <div className="flex gap-4 flex-wrap">
-          <Button asChild variant="primary">
+          <Button asChild variant="default">
             <Link href="/dashboard/admin/leads">View All Leads</Link>
           </Button>
           <Button asChild variant="outline">

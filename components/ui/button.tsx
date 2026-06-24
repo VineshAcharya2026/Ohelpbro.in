@@ -8,8 +8,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-md",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md",
+        default: "bg-accent text-accent-foreground hover:bg-accent-dark shadow-md",
+        primary: "bg-primary text-primary-foreground hover:bg-primary-light shadow-md",
         destructive: "bg-red-500 text-white hover:bg-red-600",
         outline:
           "border-2 border-primary text-primary bg-transparent hover:bg-primary hover:text-primary-foreground",

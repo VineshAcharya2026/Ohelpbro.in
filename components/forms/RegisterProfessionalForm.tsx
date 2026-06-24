@@ -178,7 +178,7 @@ export function RegisterProfessionalForm() {
         <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>
       )}
 
-      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+      <Button type="submit" variant="default" className="w-full" disabled={loading}>
         {loading ? "Submitting..." : "Register"}
       </Button>
     </form>

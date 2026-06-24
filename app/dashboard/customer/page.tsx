@@ -39,7 +39,7 @@ export default function CustomerDashboardPage() {
               Track your service requests and registrations
             </p>
           </div>
-          <Button asChild variant="primary">
+          <Button asChild variant="default">
             <Link href="/contact">New Request</Link>
           </Button>
         </div>

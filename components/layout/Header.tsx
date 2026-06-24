@@ -63,7 +63,7 @@ export function Header() {
           </nav>
 
           <div className="hidden xl:flex items-center gap-1.5 shrink-0">
-            <Button asChild variant="primary" size="sm" className="h-8 text-xs px-3">
+            <Button asChild variant="default" size="sm" className="h-8 text-xs px-3">
               <Link href="/contact">Book Now</Link>
             </Button>
             <Button asChild variant="outline" size="sm" className="h-8 text-xs px-3">
@@ -78,7 +78,7 @@ export function Header() {
           </div>
 
           <div className="flex xl:hidden items-center gap-2 shrink-0">
-            <Button asChild variant="primary" size="sm" className="h-8 text-xs px-3 hidden sm:inline-flex">
+            <Button asChild variant="default" size="sm" className="h-8 text-xs px-3 hidden sm:inline-flex">
               <Link href="/contact">Book</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="h-8 text-xs px-2 hidden sm:inline-flex">
@@ -147,7 +147,7 @@ export function Header() {
               )
             )}
             <div className="flex flex-col gap-2 pt-3 px-1">
-              <Button asChild variant="primary" className="w-full h-9" size="sm">
+              <Button asChild variant="default" className="w-full h-9" size="sm">
                 <Link href="/contact" onClick={() => setMobileOpen(false)}>
                   Book Our Services
                 </Link>

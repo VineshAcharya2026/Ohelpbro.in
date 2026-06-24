@@ -78,8 +78,8 @@ export function DashboardSidebar({ role, userName }: DashboardSidebarProps) {
               className={cn(
                 "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors",
                 active
-                  ? "bg-white/15 text-white font-medium"
-                  : "text-primary-foreground/80 hover:bg-white/10"
+                  ? "bg-white/15 text-white font-medium border-l-4 border-accent"
+                  : "text-primary-foreground/80 hover:bg-white/10 border-l-4 border-transparent"
               )}
             >
               <Icon className="h-4 w-4" />

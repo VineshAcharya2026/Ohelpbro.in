@@ -41,7 +41,7 @@ export function DashboardShell({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-primary-muted">
         <p className="text-muted-foreground">Loading dashboard...</p>
       </div>
     );
@@ -50,7 +50,7 @@ export function DashboardShell({
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen bg-muted/30">
+    <div className="flex min-h-screen bg-primary-muted">
       <DashboardSidebar role={user.role} userName={user.fullName} />
       <main className="flex-1 p-6 md:p-8 overflow-auto">{children}</main>
     </div>

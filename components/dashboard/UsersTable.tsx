@@ -81,9 +81,9 @@ export function UsersTable({ onUpdate }: { onUpdate?: () => void }) {
   };
 
   const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    active: "bg-green-100 text-green-800",
-    suspended: "bg-red-100 text-red-800",
+    pending: "bg-accent-light text-accent-dark",
+    active: "bg-emerald-50 text-emerald-800",
+    suspended: "bg-red-50 text-red-700",
   };
 
   if (loading) return <p className="text-muted-foreground">Loading users...</p>;

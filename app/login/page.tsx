@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SITE_NAME } from "@/lib/constants";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,13 +42,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-16">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 bg-primary-muted">
       <div className="w-full max-w-md bg-white rounded-xl shadow-md border border-border/50 p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-white font-bold text-xl mb-4">
-            O
-          </div>
-          <h1 className="text-2xl font-bold text-primary">Sign in to {SITE_NAME}</h1>
+          <Link href="/" className="inline-block mb-4">
+            <Image
+              src="/ohelpbro-logo.png"
+              alt="Ohelpbro"
+              width={160}
+              height={48}
+              className="h-10 w-auto mx-auto"
+              priority
+            />
+          </Link>
+          <h1 className="text-2xl font-bold text-primary">Sign in</h1>
           <p className="text-muted-foreground text-sm mt-2">
             Admin, Customer, or Professional dashboard
           </p>
@@ -79,16 +86,16 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>
+            <p className="text-sm text-accent bg-accent-light p-3 rounded-lg">{error}</p>
           )}
 
-          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+          <Button type="submit" variant="default" className="w-full" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          <Link href="/" className="text-accent hover:underline">
+          <Link href="/" className="text-accent hover:text-accent-dark hover:underline">
             Back to website
           </Link>
         </p>
