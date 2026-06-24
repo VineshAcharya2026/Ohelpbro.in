@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,35 +15,60 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ALL_SERVICES } from "@/lib/constants";
-import { submitViaWhatsApp } from "@/lib/whatsapp";
+import { FormSuccess } from "@/components/forms/FormSuccess";
 import {
   contactFormSchema,
   type ContactFormData,
 } from "@/lib/validations";
 
 export function ContactForm() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState<{
+    message: string;
+    whatsappUrl?: string;
+  } | null>(null);
+
   const {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
   });
 
-  const onSubmit = (data: ContactFormData) => {
-    const lines = [
-      "Hi, I'm contacting Ohelpbro.",
-      "",
-      `Name: ${data.fullName}`,
-      `Email: ${data.email}`,
-      `Phone: ${data.phone}`,
-      `Service: ${data.service}`,
-    ];
-    if (data.message) lines.push(`Message: ${data.message}`);
+  const onSubmit = async (data: ContactFormData) => {
+    setLoading(true);
+    setError("");
+    setSuccess(null);
 
-    submitViaWhatsApp(lines.join("\n"));
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, formType: "contact" }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to submit");
+
+      setSuccess({
+        message: result.message,
+        whatsappUrl: result.whatsappUrl,
+      });
+      reset();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (success) {
+    return <FormSuccess message={success.message} whatsappUrl={success.whatsappUrl} />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -95,13 +120,12 @@ export function ContactForm() {
         <Textarea id="message" {...register("message")} className="mt-1.5" />
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Submitting opens WhatsApp with your details pre-filled to +91 95380 33894.
-      </p>
+      {error && (
+        <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>
+      )}
 
-      <Button type="submit" variant="primary" className="w-full bg-[#25D366] hover:bg-[#20BD5A]">
-        <MessageCircle className="mr-2 h-4 w-4" />
-        Send via WhatsApp
+      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+        {loading ? "Submitting..." : "Submit"}
       </Button>
     </form>
   );

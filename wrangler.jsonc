@@ -25,6 +25,14 @@
   "images": {
     "binding": "IMAGES"
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ohelpbro-db",
+      "database_id": "682073e2-cb9c-4689-acc6-0c1e5a7b5b8b",
+      "migrations_dir": "migrations"
+    }
+  ],
   "observability": {
     "enabled": true
   }

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,22 +16,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ALL_SERVICES, EXPERIENCE_OPTIONS } from "@/lib/constants";
-import { submitViaWhatsApp } from "@/lib/whatsapp";
+import { FormSuccess } from "@/components/forms/FormSuccess";
 import {
-  registerProfessionalSchema,
-  type RegisterProfessionalData,
+  registerProfessionalWithPasswordSchema,
+  type RegisterProfessionalWithPasswordData,
 } from "@/lib/validations";
 
 export function RegisterProfessionalForm() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState<{
+    message: string;
+    whatsappUrl?: string;
+  } | null>(null);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
-  } = useForm<RegisterProfessionalData>({
-    resolver: zodResolver(registerProfessionalSchema),
+  } = useForm<RegisterProfessionalWithPasswordData>({
+    resolver: zodResolver(registerProfessionalWithPasswordSchema),
     defaultValues: { servicesProvided: [] },
   });
 
@@ -44,23 +50,37 @@ export function RegisterProfessionalForm() {
     setValue("servicesProvided", updated, { shouldValidate: true });
   };
 
-  const onSubmit = (data: RegisterProfessionalData) => {
-    const lines = [
-      "Hi, I'd like to register as a professional on Ohelpbro.",
-      "",
-      `Name: ${data.fullName}`,
-      `Email: ${data.email}`,
-      `Phone: ${data.phone}`,
-    ];
-    if (data.companyName) lines.push(`Company: ${data.companyName}`);
-    lines.push(
-      `Services Provided: ${data.servicesProvided.join(", ")}`,
-      `Experience: ${data.experience}`
-    );
-    if (data.message) lines.push(`About: ${data.message}`);
+  const onSubmit = async (data: RegisterProfessionalWithPasswordData) => {
+    setLoading(true);
+    setError("");
+    setSuccess(null);
 
-    submitViaWhatsApp(lines.join("\n"));
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, formType: "register-professional" }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to submit");
+
+      setSuccess({
+        message: result.message,
+        whatsappUrl: result.whatsappUrl,
+      });
+      reset();
+      setSelectedServices([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (success) {
+    return <FormSuccess message={success.message} whatsappUrl={success.whatsappUrl} />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -91,6 +111,14 @@ export function RegisterProfessionalForm() {
       <div>
         <Label htmlFor="companyName">Company Name (if applicable)</Label>
         <Input id="companyName" {...register("companyName")} className="mt-1.5" />
+      </div>
+
+      <div>
+        <Label htmlFor="password">Password *</Label>
+        <Input id="password" type="password" {...register("password")} className="mt-1.5" />
+        {errors.password && (
+          <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+        )}
       </div>
 
       <div>
@@ -143,12 +171,15 @@ export function RegisterProfessionalForm() {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Submitting opens WhatsApp with your registration details to +91 95380 33894.
+        Your account will be pending until admin approval. You can log in after activation.
       </p>
 
-      <Button type="submit" variant="primary" className="w-full bg-[#25D366] hover:bg-[#20BD5A]">
-        <MessageCircle className="mr-2 h-4 w-4" />
-        Register via WhatsApp
+      {error && (
+        <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>
+      )}
+
+      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+        {loading ? "Submitting..." : "Register"}
       </Button>
     </form>
   );

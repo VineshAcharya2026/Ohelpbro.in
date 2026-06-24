@@ -35,3 +35,19 @@ export const registerProfessionalSchema = z.object({
 export type ContactFormData = z.infer<typeof contactFormSchema>;
 export type RegisterCustomerData = z.infer<typeof registerCustomerSchema>;
 export type RegisterProfessionalData = z.infer<typeof registerProfessionalSchema>;
+
+export const registerCustomerWithPasswordSchema = registerCustomerSchema.extend({
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const registerProfessionalWithPasswordSchema =
+  registerProfessionalSchema.extend({
+    password: z.string().min(6, "Password must be at least 6 characters"),
+  });
+
+export type RegisterCustomerWithPasswordData = z.infer<
+  typeof registerCustomerWithPasswordSchema
+>;
+export type RegisterProfessionalWithPasswordData = z.infer<
+  typeof registerProfessionalWithPasswordSchema
+>;

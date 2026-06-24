@@ -67,7 +67,7 @@ export function Header() {
               <Link href="/register-professional">Register as Professional</Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
-              <Link href="#">Login</Link>
+              <Link href="/login">Login</Link>
             </Button>
           </div>
 
@@ -151,7 +151,7 @@ export function Header() {
                 </Link>
               </Button>
               <Button asChild variant="ghost" className="w-full">
-                <Link href="#" onClick={() => setMobileOpen(false)}>
+                <Link href="/login" onClick={() => setMobileOpen(false)}>
                   Login
                 </Link>
               </Button>

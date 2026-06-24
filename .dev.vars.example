@@ -1,0 +1,3 @@
+SESSION_SECRET=dev-secret-key-minimum-32-characters-long
+ADMIN_EMAIL=admin@ohelpbro.in
+ADMIN_PASSWORD=admin123456

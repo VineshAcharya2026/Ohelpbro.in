@@ -1,0 +1,56 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { DashboardShell } from "@/components/dashboard/DashboardShell";
+
+export default function ProfessionalProfilePage() {
+  const [user, setUser] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => setUser(d.user));
+  }, []);
+
+  if (!user) return null;
+
+  const services = (user.services as string[]) || [];
+
+  return (
+    <DashboardShell allowedRoles={["professional"]}>
+      <div className="space-y-6 max-w-lg">
+        <h1 className="text-3xl font-bold text-primary">My Profile</h1>
+        <div className="bg-white rounded-xl shadow-md border p-6 space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Name</p>
+            <p className="font-medium">{String(user.fullName)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Email</p>
+            <p className="font-medium">{String(user.email)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Phone</p>
+            <p className="font-medium">{String(user.phone)}</p>
+          </div>
+          {user.experience ? (
+            <div>
+              <p className="text-sm text-muted-foreground">Experience</p>
+              <p className="font-medium">{String(user.experience)}</p>
+            </div>
+          ) : null}
+          {services.length > 0 && (
+            <div>
+              <p className="text-sm text-muted-foreground">Services Provided</p>
+              <p className="font-medium">{services.join(", ")}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-sm text-muted-foreground">Status</p>
+            <p className="font-medium capitalize">{String(user.status)}</p>
+          </div>
+        </div>
+      </div>
+    </DashboardShell>
+  );
+}

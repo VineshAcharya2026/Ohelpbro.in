@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,22 +16,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ALL_SERVICES, EMPLOYEE_TYPES } from "@/lib/constants";
-import { submitViaWhatsApp } from "@/lib/whatsapp";
+import { FormSuccess } from "@/components/forms/FormSuccess";
 import {
-  registerCustomerSchema,
-  type RegisterCustomerData,
+  registerCustomerWithPasswordSchema,
+  type RegisterCustomerWithPasswordData,
 } from "@/lib/validations";
 
 export function RegisterCustomerForm() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState<{
+    message: string;
+    whatsappUrl?: string;
+  } | null>(null);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const {
     register,
     handleSubmit,
     setValue,
+    reset,
     formState: { errors },
-  } = useForm<RegisterCustomerData>({
-    resolver: zodResolver(registerCustomerSchema),
+  } = useForm<RegisterCustomerWithPasswordData>({
+    resolver: zodResolver(registerCustomerWithPasswordSchema),
     defaultValues: { servicesNeeded: [] },
   });
 
@@ -44,23 +50,37 @@ export function RegisterCustomerForm() {
     setValue("servicesNeeded", updated, { shouldValidate: true });
   };
 
-  const onSubmit = (data: RegisterCustomerData) => {
-    const lines = [
-      "Hi, I'd like to register as a customer on Ohelpbro.",
-      "",
-      `Name: ${data.fullName}`,
-      `Email: ${data.email}`,
-      `Phone: ${data.phone}`,
-    ];
-    if (data.companyName) lines.push(`Company: ${data.companyName}`);
-    lines.push(
-      `Services Needed: ${data.servicesNeeded.join(", ")}`,
-      `Employee Type: ${data.employeeType}`
-    );
-    if (data.message) lines.push(`Additional Requirements: ${data.message}`);
+  const onSubmit = async (data: RegisterCustomerWithPasswordData) => {
+    setLoading(true);
+    setError("");
+    setSuccess(null);
 
-    submitViaWhatsApp(lines.join("\n"));
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, formType: "register-customer" }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to submit");
+
+      setSuccess({
+        message: result.message,
+        whatsappUrl: result.whatsappUrl,
+      });
+      reset();
+      setSelectedServices([]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (success) {
+    return <FormSuccess message={success.message} whatsappUrl={success.whatsappUrl} />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -91,6 +111,14 @@ export function RegisterCustomerForm() {
       <div>
         <Label htmlFor="companyName">Company Name</Label>
         <Input id="companyName" {...register("companyName")} className="mt-1.5" />
+      </div>
+
+      <div>
+        <Label htmlFor="password">Password *</Label>
+        <Input id="password" type="password" {...register("password")} className="mt-1.5" />
+        {errors.password && (
+          <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+        )}
       </div>
 
       <div>
@@ -143,12 +171,15 @@ export function RegisterCustomerForm() {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Submitting opens WhatsApp with your registration details to +91 95380 33894.
+        Your account will be pending until admin approval. You can log in after activation.
       </p>
 
-      <Button type="submit" variant="primary" className="w-full bg-[#25D366] hover:bg-[#20BD5A]">
-        <MessageCircle className="mr-2 h-4 w-4" />
-        Register via WhatsApp
+      {error && (
+        <p className="text-sm text-red-500 bg-red-50 p-3 rounded-lg">{error}</p>
+      )}
+
+      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+        {loading ? "Submitting..." : "Register"}
       </Button>
     </form>
   );
