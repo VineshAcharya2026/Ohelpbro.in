@@ -1,7 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
 import {
-  SITE_NAME,
   COMPANY_NAME,
   GST_NUMBER,
   FOOTER_LINKS,
@@ -13,11 +13,16 @@ export function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-primary font-bold text-xl">
-            O
-          </div>
-          <span className="text-2xl font-bold">{SITE_NAME}</span>
+        <div className="flex items-center mb-10">
+          <Link href="/" className="inline-block bg-white rounded-lg px-3 py-2">
+            <Image
+              src="/ohelpbro-logo.png"
+              alt="Ohelpbro"
+              width={150}
+              height={44}
+              className="h-9 w-auto"
+            />
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">

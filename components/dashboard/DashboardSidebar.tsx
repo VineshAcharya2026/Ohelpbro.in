@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -12,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SITE_NAME } from "@/lib/constants";
 
 interface DashboardSidebarProps {
   role: "admin" | "customer" | "professional";
@@ -55,11 +55,14 @@ export function DashboardSidebar({ role, userName }: DashboardSidebarProps) {
   return (
     <aside className="w-64 bg-primary text-primary-foreground min-h-screen flex flex-col shrink-0">
       <div className="p-6 border-b border-white/10">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-primary font-bold">
-            O
-          </div>
-          <span className="font-bold text-lg">{SITE_NAME}</span>
+        <Link href="/" className="inline-block bg-white rounded-lg px-2 py-1.5">
+          <Image
+            src="/ohelpbro-logo.png"
+            alt="Ohelpbro"
+            width={130}
+            height={38}
+            className="h-7 w-auto"
+          />
         </Link>
         <p className="text-sm text-primary-foreground/70 mt-3 capitalize">{role} Dashboard</p>
       </div>
